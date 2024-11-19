@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragment :: header"/>
+<body>
+
+<!--
+<div th:replace="fragment :: slideshow"></div>
+<div th:replace="fragment :: categories"></div>
+<div th:replace="~{fragment :: categories}"></div>-->
+<div th:replace="~{fragment :: categories}"></div>
+<!--
+<div th:replace="fragment :: map"></div>
+<div th:replace="fragment :: posts"></div>
+<div th:replace="fragment :: footer"></div>
+-->
+<!-- 投稿セクション -->
+    <section>
+        <h2>投稿一覧</h2>
+        <div class="posts">
+            <div class="post" th:each="post : ${posts}">
+                <h3 th:text="${post.title}">投稿タイトル</h3>
+                <p th:text="${post.description}">投稿の説明</p>
+                <img th:src="@{${post.image}}" alt="投稿イメージ">
+                <p th:text="${post.date}">投稿日時</p>
+            </div>
+        </div>
+    </section>
+<a>aaa</a>
+</body>
+</html>

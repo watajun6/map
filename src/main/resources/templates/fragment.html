@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>地域密着型マップ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</head>
+<body>
+<!-- ヘッダー -->
+<div th:fragment="header">
+    <header>
+        <h1>地域密着型マップ</h1>
+        <nav>
+            <a th:href="@{/companies}">企業一覧</a>
+        </nav>
+    </header>
+</div>
+
+<!-- スライドショー -->
+<div th:fragment="slideshow">
+    <div id="carousel" class="carousel">
+        <div th:each="image : ${slideImages}" class="carousel-item">
+            <img th:src="@{${image.url}}" alt="スライド画像">
+        </div>
+    </div>
+    <script>
+        let currentSlide = 0;
+        function showSlide() {
+            const slides = document.querySelectorAll('.carousel-item');
+            slides.forEach(slide => slide.style.display = 'none');
+            slides[currentSlide].style.display = 'block';
+            currentSlide = (currentSlide + 1) % slides.length;
+        }
+        setInterval(showSlide, 3000);  // 3秒ごとにスライド
+    </script>
+</div>
+
+<!-- カテゴリカルーセルフラグメント -->
+    <div th:fragment="categories">
+        <div class="carousel-wrapper">
+            <!-- カテゴリ1 -->
+            <div class="carousel-title">カテゴリ1:</div>
+            <div class="carousel-items">
+                <div class="carousel-item" 
+				     th:each="category1 : ${category1List}" 
+    				 th:data-category="${category1}" 
+ 					onclick="updateCategory2(this.dataset.category)">
+				</div>
+            </div>
+
+            <!-- カテゴリ2 -->
+            <div class="carousel-title">カテゴリ2:</div>
+            <div class="carousel-items category2-carousel" id="category2Carousel">
+                <!-- JavaScriptで動的に更新 -->
+            </div>
+
+            <!-- 左右ボタン -->
+            <button class="carousel-button prev" onclick="scrollCarousel('prev')">前へ</button>
+            <button class="carousel-button next" onclick="scrollCarousel('next')">次へ</button>
+        </div>
+
+        <!-- Google Maps -->
+        <div id="map" style="width: 100%; height: 400px;"></div>
+
+        <!-- JavaScriptでカテゴリ2データとマップ機能 -->
+        <script type="application/json" id="category2Options" th:text="${category2Json}"></script>
+        <script>
+    function updateCategory2(selectedCategory1) {
+        const category2Carousel = document.getElementById("category2Carousel");
+        const category2Options = JSON.parse(document.getElementById("category2Options").textContent);
+
+        category2Carousel.innerHTML = '';
+
+        const options = category2Options[selectedCategory1] || [];
+        options.forEach(option => {
+            const item = document.createElement("div");
+            item.className = "carousel-item";
+            item.textContent = option;
+            category2Carousel.appendChild(item);
+        });
+    }
+
+
+            function scrollCarousel(direction) {
+                console.log(`カルーセルのスクロール: ${direction}`);
+            }
+
+            function initializeMap() {
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: 35.6895, lng: 139.6917 }, // 東京をデフォルトに設定
+                    zoom: 12,
+                });
+
+                // カテゴリ1とカテゴリ2の選択に基づき、マーカーを動的に設定
+                document.querySelectorAll(".category1-item").forEach(item => {
+                    item.addEventListener("click", () => {
+                        const location = { lat: 35.6895, lng: 139.6917 }; // 仮の位置
+                        new google.maps.Marker({
+                            position: location,
+                            map: map,
+                            title: "選択されたカテゴリの場所",
+                        });
+                    });
+                });
+            }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD42Pvxc5R71C7DNclgDCOfFXp_dU-IyCg&callback=initializeMap" async defer></script>
+    </div>
+
+<!-- SNS投稿エリア -->
+<div th:fragment="posts">
+    <div id="posts">
+        <h2>最新の投稿</h2>
+        <div th:each="post : ${posts}">
+            <p th:text="${post.content}"></p>
+            <img th:src="@{${post.imageUrl}}" alt="投稿画像">
+        </div>
+    </div>
+</div>
+
+<!-- フッター -->
+<div th:fragment="footer">
+    <footer>
+        <a th:href="@{/contact}">お問い合わせ</a>
+    </footer>
+</div>
+
+</body>
+</html>
